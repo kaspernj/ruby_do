@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors = ["Kasper Johansen"]
   s.date = %q{2012-07-08}
   s.default_executable = %q{ruby_do.rb}
-  s.description = %q{TODO: longer description of your gem}
+  s.description = %q{A clone of Gnome-Do and Kupfer written in Ruby. }
   s.email = %q{k@spernj.org}
   s.executables = ["ruby_do.rb"]
   s.extra_rdoc_files = [
@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
     "gui/win_main.rb",
     "include/unix_socket.rb",
     "lib/ruby_do.rb",
+    "ruby_do.gemspec",
     "spec/ruby_do_spec.rb",
     "spec/spec_helper.rb"
   ]
@@ -39,7 +40,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{TODO: one-line summary of your gem}
+  s.summary = %q{A clone of Gnome-Do and Kupfer written in Ruby.}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
