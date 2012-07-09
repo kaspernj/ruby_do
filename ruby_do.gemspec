@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby_do}
-  s.version = "0.0.0"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
-  s.date = %q{2012-07-08}
+  s.date = %q{2012-07-09}
   s.default_executable = %q{ruby_do.rb}
-  s.description = %q{A clone of Gnome-Do and Kupfer written in Ruby. }
+  s.description = %q{A clone of Gnome-Do and Kupfer written in Ruby.}
   s.email = %q{k@spernj.org}
   s.executables = ["ruby_do.rb"]
   s.extra_rdoc_files = [
@@ -28,10 +28,18 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/ruby_do.rb",
+    "gfx/search.png",
     "glade/win_main.glade",
+    "glade/win_properties.glade",
     "gui/win_main.rb",
+    "gui/win_properties.rb",
+    "include/database.rb",
+    "include/gui.rb",
+    "include/models.rb",
+    "include/plugin.rb",
     "include/unix_socket.rb",
     "lib/ruby_do.rb",
+    "models/plugin.rb",
     "ruby_do.gemspec",
     "spec/ruby_do_spec.rb",
     "spec/spec_helper.rb"
@@ -49,6 +57,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<gtk2>, [">= 0"])
       s.add_runtime_dependency(%q<knjrbfw>, [">= 0"])
       s.add_runtime_dependency(%q<gettext>, [">= 0"])
+      s.add_runtime_dependency(%q<sqlite3>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, [">= 1.0.0"])
@@ -58,6 +67,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<gtk2>, [">= 0"])
       s.add_dependency(%q<knjrbfw>, [">= 0"])
       s.add_dependency(%q<gettext>, [">= 0"])
+      s.add_dependency(%q<sqlite3>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, [">= 1.0.0"])
@@ -68,6 +78,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<gtk2>, [">= 0"])
     s.add_dependency(%q<knjrbfw>, [">= 0"])
     s.add_dependency(%q<gettext>, [">= 0"])
+    s.add_dependency(%q<sqlite3>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, [">= 1.0.0"])
