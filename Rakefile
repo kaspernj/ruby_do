@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "ruby_do"
   gem.homepage = "http://github.com/kaspernj/ruby_do"
   gem.license = "MIT"
-  gem.summary = %Q{A clone of Gnome-Do and Kupfer written in Ruby. }
-  gem.description = %Q{A clone of Gnome-Do and Kupfer written in Ruby. }
+  gem.summary = %Q{A clone of Gnome-Do and Kupfer written in Ruby.}
+  gem.description = %Q{A clone of Gnome-Do and Kupfer written in Ruby.}
   gem.email = "k@spernj.org"
   gem.authors = ["Kasper Johansen"]
   # dependencies defined in Gemfile

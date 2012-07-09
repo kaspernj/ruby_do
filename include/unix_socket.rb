@@ -21,8 +21,8 @@ class Ruby_do::Unix_socket
           client.each_line do |line|
             line = line.strip
             
-            if line.strip == "open_main_window"
-              @args[:oata].show_main
+            if line.strip == "show_win_main"
+              @args[:rdo].show_win_main
             else
               $stderr.puts "Unknown line: #{line}"
             end

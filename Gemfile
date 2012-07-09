@@ -6,6 +6,7 @@ source "http://rubygems.org"
 gem "gtk2"
 gem "knjrbfw"
 gem "gettext"
+gem "sqlite3"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

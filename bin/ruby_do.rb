@@ -22,6 +22,11 @@ if args[:cmd]
   exit
 end
 
+def _(str)
+  return GetText._(str)
+end
+
 require "#{File.realpath(File.dirname(__FILE__))}/../lib/ruby_do.rb"
 rdo = Ruby_do.new
+rdo.show_win_main
 rdo.join
