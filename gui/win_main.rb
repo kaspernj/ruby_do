@@ -37,10 +37,12 @@ class Ruby_do::Gui::Win_main
   
   #Updates the icon, title and description to match the current result (if any).
   def update_res
-    if @cur_res
-      @gui["labActionTitle"].markup = @cur_res.title_html!
-      @gui["labActionDescr"].label = @cur_res.descr_html!
-      @gui["imgActionIcon"].pixbuf = @cur_res.icon_pixbuf!
+    cur_res = @results[@result_i] if @results and @result_i != nil
+    
+    if cur_res
+      @gui["labActionTitle"].markup = cur_res.title_html!
+      @gui["labActionDescr"].label = cur_res.descr_html!
+      @gui["imgActionIcon"].pixbuf = cur_res.icon_pixbuf!
     else
       @gui["labActionTitle"].markup = "<b>#{Knj::Web.html(_("Nothing found"))}</b>"
       @gui["labActionDescr"].label = _("Please enter something in the search text-field to do something.")
@@ -61,6 +63,10 @@ class Ruby_do::Gui::Win_main
   def on_txtSearch_changed_wait
     return nil if @gui["window"].destroyed?
     
+    @enum = nil
+    @results = []
+    @result_i = -1
+    
     text = @gui["txtSearch"].text
     words = text.split(/\s+/).map{|ele| ele.downcase}
     
@@ -68,11 +74,23 @@ class Ruby_do::Gui::Win_main
       @cur_res = nil
     else
       @enum = @args[:rdo].plugin.send(:text => text, :words => words)
-      
+      self.next_result
+    end
+  end
+  
+  def prev_result
+    @result_i -= 1 if @result_i > 0
+    self.update_res
+  end
+  
+  def next_result
+    @result_i += 1
+    
+    if @enum and @result_i >= @results.length
       begin
-        @cur_res = @enum.next
+        @results << @enum.next
       rescue StopIteration
-        @cur_res = nil
+        @result_i -= 1
       end
     end
     
@@ -105,8 +123,16 @@ class Ruby_do::Gui::Win_main
   
   #In order the register <ESCAPE>-presses.
   def on_txtSearch_key_press_event(entry, eventkey)
-    if Gdk::Keyval.to_name(eventkey.keyval) == "Escape"
+    name = Gdk::Keyval.to_name(eventkey.keyval).to_s.downcase
+    
+    if name == "escape"
       @gui["window"].destroy
+    elsif name == "down"
+      self.next_result
+      return false
+    elsif name == "up"
+      self.prev_result
+      return false
     end
   end
   

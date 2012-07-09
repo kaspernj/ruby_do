@@ -10,7 +10,14 @@ class Ruby_do
   def initialize(args = {})
     #Require various used libs.
     require "rubygems"
-    require "knjrbfw"
+    
+    
+    #Enable local dev-mode.
+    if File.exists?("/home/kaspernj/Dev/Ruby/knjrbfw")
+      require "/home/kaspernj/Dev/Ruby/knjrbfw/lib/knjrbfw.rb"
+    else
+      require "knjrbfw"
+    end
     
     
     #Set arguments (config).
