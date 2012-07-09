@@ -1,3 +1,4 @@
+#This class controls the properties window.
 class Ruby_do::Gui::Win_properties
   attr_reader :gui
   
@@ -26,6 +27,14 @@ class Ruby_do::Gui::Win_properties
     
     #Hides checkbutton until a plugin is chosen.
     self.load_widget
+    
+    
+    #Set the value of main-window-show checkbutton.
+    if Knj::Opts.get("skip_main_on_startup").to_i == 1
+      @gui["cbShowWindowOnStartup"].active = false
+    else
+      @gui["cbShowWindowOnStartup"].active = true
+    end
   end
   
   def reload_plugins
@@ -107,5 +116,15 @@ class Ruby_do::Gui::Win_properties
     end
     
     self.load_widget
+  end
+  
+  def on_cbShowWindowOnStartup_toggled
+    val = @gui["cbShowWindowOnStartup"].active?
+    
+    if val
+      Knj::Opts.set("skip_main_on_startup", 0)
+    else
+      Knj::Opts.set("skip_main_on_startup", 1)
+    end
   end
 end

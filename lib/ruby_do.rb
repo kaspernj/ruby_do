@@ -10,10 +10,7 @@ class Ruby_do
   def initialize(args = {})
     #Require various used libs.
     require "rubygems"
-    require "gtk2"
     require "knjrbfw"
-    require "gettext"
-    require "sqlite3"
     
     
     #Set arguments (config).
@@ -23,8 +20,36 @@ class Ruby_do
     
     @args = {
       :sock_path => "#{path}/sock",
-      :db_path => "#{path}/database.sqlite3"
+      :db_path => "#{path}/database.sqlite3",
+      :run_path => "#{path}/run"
     }.merge(args)
+    
+    
+    #Checks if the run-file exists and creates it if not.
+    if File.exists?(@args[:run_path])
+      pid = File.read(@args[:run_path]).to_i
+      procs = Knj::Unix_proc.list("pids" => [pid])
+      if !procs.empty?
+        puts "Ruby-Do is already running. Trying to show main window..."
+        require "socket"
+        UNIXSocket.open(@args[:sock_path]) do |sock|
+          sock.puts "show_win_main"
+        end
+        
+        exit
+        #raise sprintf(_("Ruby-Do is already running with PID '%s'."), pid)
+      end
+    end
+    
+    File.open(@args[:run_path], "w") do |fp|
+      fp.write(Process.pid)
+    end
+    
+    
+    #Require the rest of the heavy libs.
+    require "gtk2"
+    require "gettext"
+    require "sqlite3"
     
     
     #Load database.
@@ -50,6 +75,11 @@ class Ruby_do
     )
     
     
+    
+    #Start options-module.
+    Knj::Opts.init("knjdb" => @db, "table" => "Option")
+    
+    
     #Start unix-socket to enable custom shortcuts.
     @unix_socket = Ruby_do::Unix_socket.new(:rdo => self)
     
@@ -57,6 +87,13 @@ class Ruby_do
     #Start plugins-engine.
     @plugin = Ruby_do::Plugin.new(:rdo => self)
     @plugin.register_plugins
+    
+    
+    #Show main window if it is not set to be skipped.
+    val = Knj::Opts.get("skip_main_on_startup").to_i
+    if val != 1
+      self.show_win_main
+    end
   end
   
   #Shows the main window. If already shown then tries to give it focus.

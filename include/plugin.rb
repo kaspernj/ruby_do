@@ -58,6 +58,9 @@ class Ruby_do::Plugin
   def send(args)
     return Enumerator.new do |yielder|
       @plugins.each do |name, plugin_instance|
+        plugin_model = @args[:rdo].ob.get_by(:Plugin, "classname" => plugin_instance.classname)
+        next if !plugin_model or plugin_model[:active].to_i != 1
+        
         begin
           enum = plugin_instance.on_search(args)
           enum.each do |res|

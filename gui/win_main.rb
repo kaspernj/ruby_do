@@ -1,26 +1,54 @@
+#This class controls the main window.
 class Ruby_do::Gui::Win_main
+  #Initializes various variables for the object.
   def initialize(args)
     @args = args
   end
   
+  #Spawn the GUI-object.
   def spawn_gui
     @gui = Gtk::Builder.new.add("#{File.dirname(__FILE__)}/../glade/win_main.glade")
     @gui.connect_signals{|h| method(h)}
     Knj::Gtk2.translate(@gui)
   end
   
+  def reset
+    @gui["txtSearch"].text = ""
+    self.update_res
+    self.on_txtSearch_changed_wait
+  end
+  
+  #Spawns the GUI (if not already spawned) and focusses the window.
   def show
     self.spawn_gui if !@gui or @gui["window"].destroyed?
+    self.reset
     
     @gui["window"].show_all
     @gui["window"].present
     @gui["txtSearch"].grab_focus
+    
+    #Update icon and text.
+    self.update_res
   end
   
   def hide
     @gui["window"].hide
   end
   
+  #Updates the icon, title and description to match the current result (if any).
+  def update_res
+    if @cur_res
+      @gui["labActionTitle"].markup = @cur_res.title_html!
+      @gui["labActionDescr"].label = @cur_res.descr_html!
+      @gui["imgActionIcon"].pixbuf = @cur_res.icon_pixbuf!
+    else
+      @gui["labActionTitle"].markup = "<b>#{Knj::Web.html(_("Nothing found"))}</b>"
+      @gui["labActionDescr"].label = _("Please enter something in the search text-field to do something.")
+      @gui["imgActionIcon"].pixbuf = Ruby_do::Plugin::Result.search_icon
+    end
+  end
+  
+  #Starts the timeout of half a second in order to not mass-call plugins and start lagging.
   def on_txtSearch_changed
     Gtk.timeout_remove(@timeout) if @timeout
     @timeout = Gtk.timeout_add(500) do
@@ -29,44 +57,56 @@ class Ruby_do::Gui::Win_main
     end
   end
   
+  #This happens when the timeout is over and the plugins should be called.
   def on_txtSearch_changed_wait
-    @enum = @args[:rdo].plugin.send(:text => @gui["txtSearch"].text)
+    return nil if @gui["window"].destroyed?
     
-    begin
-      @cur_res = @enum.next
-    rescue StopIteration
+    text = @gui["txtSearch"].text
+    words = text.split(/\s+/).map{|ele| ele.downcase}
+    
+    if words.empty?
       @cur_res = nil
+    else
+      @enum = @args[:rdo].plugin.send(:text => text, :words => words)
+      
+      begin
+        @cur_res = @enum.next
+      rescue StopIteration
+        @cur_res = nil
+      end
     end
     
     self.update_res
   end
   
-  def update_res
-    if @cur_res
-      @gui["labActionTitle"].markup = @cur_res.title_html!
-      @gui["labActionDescr"].label = @cur_res.descr_html!
-      @gui["imgActionIcon"].pixbuf = @cur_res.icon_pixbuf!
-    else
-      @gui["labActionTitle"].markup = _("Nothing found")
-      @gui["labActionDescr"].label = _("Please enter something in the search text-field to do something.")
-      @gui["imgActionIcon"].pixbuf = Ruby_do::Plugin::Result.search_icon
-    end
-  end
-  
+  #This happens when <ENTER> is pressed while the search-textfield has focus.
   def on_txtSearch_activate
+    #If enter was pressed before search was executed, then be sure to execute a search first and disable the timeout, so search wont be done two times.
+    if @timeout
+      Gtk.timeout_remove(@timeout)
+      self.on_txtSearch_changed_wait
+    end
+    
     if !@cur_res
       Knj::Gtk2.msgbox(_("Please search for something in order to activate."))
       return nil
     end
     
     begin
-      res = @cur_res.args[:plugin].execute_result(@cur_res)
+      res = @cur_res.args[:plugin].execute_result(:res => @cur_res)
       
       if res == :close_win_main
         @gui["window"].destroy
       end
     rescue => e
       Knj::Gtk2.msgbox(_("An error occurred.") + "\n\n#{e.inspect}\n\n#{e.backtrace.join("\n")}")
+    end
+  end
+  
+  #In order the register <ESCAPE>-presses.
+  def on_txtSearch_key_press_event(entry, eventkey)
+    if Gdk::Keyval.to_name(eventkey.keyval) == "Escape"
+      @gui["window"].destroy
     end
   end
   
