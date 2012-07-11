@@ -52,15 +52,29 @@ class Ruby_do::Gui::Win_properties
     sel = Knj::Gtk2::Tv.sel(@gui["tvPlugins"])
     model = @args[:rdo].ob.get_by(:Plugin, {"classname" => sel[0]}) if sel
     
-    if model and model[:active].to_i == 1
-      @gui["cbPluginActivate"].active = true
+    if model
+      @gui["tablePlugin"].show
+      
+      if model[:active].to_i == 1
+        @gui["cbPluginActivate"].active = true
+      else
+        @gui["cbPluginActivate"].active = false
+      end
+      
+      @gui["txtPluginOrderNo"].text = model[:order_no].to_s
     else
-      @gui["cbPluginActivate"].active = false
+      @gui["tablePlugin"].hide
     end
     
     self.load_widget
-    
     @gui["boxPluginOptions"].show_all
+  end
+  
+  def on_txtPluginOrderNo_changed
+    sel = Knj::Gtk2::Tv.sel(@gui["tvPlugins"])
+    model = @args[:rdo].ob.get_by(:Plugin, {"classname" => sel[0]}) if sel
+    return nil if !model
+    model[:order_no] = @gui["txtPluginOrderNo"].text
   end
   
   def load_widget

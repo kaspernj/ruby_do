@@ -7,6 +7,7 @@ gem "gtk2"
 gem "knjrbfw"
 gem "gettext"
 gem "sqlite3"
+gem "threadded_enumerator"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

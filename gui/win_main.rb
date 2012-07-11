@@ -37,10 +37,20 @@ class Ruby_do::Gui::Win_main
   
   #Updates the icon, title and description to match the current result (if any).
   def update_res
-    cur_res = @results[@result_i] if @results and @result_i != nil
+    if @results and @enum
+      while @results.length <= @result_i
+        begin
+          @results << @enum.next
+        rescue StopIteration
+          @result_i -= 1
+        end
+      end
+      
+      cur_res = @results[@result_i]
+    end
     
     if cur_res
-      @gui["labActionTitle"].markup = cur_res.title_html!
+      @gui["labActionTitle"].markup = "<b>#{@result_i + 1}</b> - " + cur_res.title_html!
       @gui["labActionDescr"].label = cur_res.descr_html!
       @gui["imgActionIcon"].pixbuf = cur_res.icon_pixbuf!
     else
@@ -55,6 +65,7 @@ class Ruby_do::Gui::Win_main
     Gtk.timeout_remove(@timeout) if @timeout
     @timeout = Gtk.timeout_add(500) do
       self.on_txtSearch_changed_wait
+      @timeout = nil
       false
     end
   end
@@ -64,18 +75,18 @@ class Ruby_do::Gui::Win_main
     return nil if @gui["window"].destroyed?
     
     @enum = nil
+    @result_i = 0
     @results = []
-    @result_i = -1
     
     text = @gui["txtSearch"].text
     words = text.split(/\s+/).map{|ele| ele.downcase}
     
-    if words.empty?
-      @cur_res = nil
-    else
-      @enum = @args[:rdo].plugin.send(:text => text, :words => words)
-      self.next_result
+    if !words.empty?
+      #Need to use threadded enumerator because of fiber failure otherwise.
+      @enum = Threadded_enumerator.new(:enum => @args[:rdo].plugin.send(:text => text, :words => words))
     end
+    
+    self.update_res
   end
   
   def prev_result
@@ -85,33 +96,26 @@ class Ruby_do::Gui::Win_main
   
   def next_result
     @result_i += 1
-    
-    if @enum and @result_i >= @results.length
-      begin
-        @results << @enum.next
-      rescue StopIteration
-        @result_i -= 1
-      end
-    end
-    
     self.update_res
   end
   
   #This happens when <ENTER> is pressed while the search-textfield has focus.
   def on_txtSearch_activate
     #If enter was pressed before search was executed, then be sure to execute a search first and disable the timeout, so search wont be done two times.
-    if @timeout
+    if @timeout and !@enum and @result_i == 0
       Gtk.timeout_remove(@timeout)
       self.on_txtSearch_changed_wait
     end
     
-    if !@cur_res
+    cur_res = @results[@result_i]
+    
+    if !cur_res
       Knj::Gtk2.msgbox(_("Please search for something in order to activate."))
       return nil
     end
     
     begin
-      res = @cur_res.args[:plugin].execute_result(:res => @cur_res)
+      res = cur_res.execute
       
       if res == :close_win_main
         @gui["window"].destroy
@@ -129,10 +133,10 @@ class Ruby_do::Gui::Win_main
       @gui["window"].destroy
     elsif name == "down"
       self.next_result
-      return false
+      return true
     elsif name == "up"
       self.prev_result
-      return false
+      return true
     end
   end
   

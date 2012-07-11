@@ -13,10 +13,16 @@ class Ruby_do
     
     
     #Enable local dev-mode.
-    if File.exists?("/home/kaspernj/Dev/Ruby/knjrbfw")
-      require "/home/kaspernj/Dev/Ruby/knjrbfw/lib/knjrbfw.rb"
+    if File.exists?("#{File.dirname(__FILE__)}/../../knjrbfw")
+      require "#{File.dirname(__FILE__)}/../../knjrbfw/lib/knjrbfw.rb"
     else
       require "knjrbfw"
+    end
+    
+    if File.exists?("#{File.dirname(__FILE__)}/../../threadded_enumerator")
+      require "#{File.dirname(__FILE__)}/../../threadded_enumerator/lib/threadded_enumerator.rb"
+    else
+      require "threadded_enumerator"
     end
     
     
