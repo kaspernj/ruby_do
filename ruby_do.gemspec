@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby_do}
-  s.version = "0.0.3"
+  s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kasper Johansen"]
-  s.date = %q{2012-07-11}
+  s.date = %q{2012-07-13}
   s.default_executable = %q{ruby_do.rb}
   s.description = %q{A clone of Gnome-Do and Kupfer written in Ruby.}
   s.email = %q{k@spernj.org}
