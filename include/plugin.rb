@@ -185,7 +185,7 @@ class Ruby_do::Plugin
     
     def icon_pixbuf!
       if @args[:icon]
-        if File.exists?(@args[:icon])
+        if File.exists?(@args[:icon]) and !File.directory?(@args[:icon])
           return Gdk::Pixbuf.new(@args[:icon])
         else
           $stderr.puts "Icon does not exist: '#{@args[:icon]}'."
