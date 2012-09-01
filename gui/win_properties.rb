@@ -92,7 +92,7 @@ class Ruby_do::Gui::Win_properties
       if model[:active].to_i == 1
         @gui["cbPluginActivate"].active = true
         
-        opt_res = plugin.on_options and opt_res[:widget]
+        opt_res = plugin.on_options if plugin.respond_to?(:on_options)
         if opt_res and opt_res[:widget]
           @gui["boxPluginOptions"].pack_start(opt_res[:widget])
           opt_res[:widget].show

@@ -125,7 +125,7 @@ class Ruby_do::Plugin
     
     #Returns a default name based on the plugin-name. This method can be over-written on the plugin itself.
     def title
-      name = Knj::Php.ucwords(self.class.name.to_s[15, 999].gsub("_", " "))
+      name = Php4r.ucwords(self.class.name.to_s[15, 999].gsub("_", " "))
     end
     
     def static_result_exists?(id_str)

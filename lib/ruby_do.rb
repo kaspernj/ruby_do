@@ -13,16 +13,20 @@ class Ruby_do
     
     
     #Enable local dev-mode.
-    if File.exists?("#{File.dirname(__FILE__)}/../../knjrbfw")
-      require "#{File.dirname(__FILE__)}/../../knjrbfw/lib/knjrbfw.rb"
-    else
-      require "knjrbfw"
+    if !Kernel.const_defined?(:Knj)
+      if File.exists?("#{File.dirname(__FILE__)}/../../knjrbfw")
+        require "#{File.dirname(__FILE__)}/../../knjrbfw/lib/knjrbfw.rb"
+      else
+        require "knjrbfw"
+      end
     end
     
-    if File.exists?("#{File.dirname(__FILE__)}/../../threadded_enumerator")
-      require "#{File.dirname(__FILE__)}/../../threadded_enumerator/lib/threadded_enumerator.rb"
-    else
-      require "threadded_enumerator"
+    if !Kernel.const_defined?(:Threadded_enumerator)
+      if File.exists?("#{File.dirname(__FILE__)}/../../threadded_enumerator")
+        require "#{File.dirname(__FILE__)}/../../threadded_enumerator/lib/threadded_enumerator.rb"
+      else
+        require "threadded_enumerator"
+      end
     end
     
     
@@ -43,6 +47,7 @@ class Ruby_do
       pid = File.read(@args[:run_path]).to_i
       procs = Knj::Unix_proc.list("pids" => [pid])
       if !procs.empty?
+        Knj.p procs
         puts "Ruby-Do is already running. Trying to show main window..."
         require "socket"
         UNIXSocket.open(@args[:sock_path]) do |sock|
@@ -54,8 +59,14 @@ class Ruby_do
       end
     end
     
+    #Create run-file with PID.
     File.open(@args[:run_path], "w") do |fp|
       fp.write(Process.pid)
+    end
+    
+    #Remove run-file when application exits.
+    Kernel.at_exit do
+      File.unlink(@args[:run_path])
     end
     
     

@@ -4,10 +4,17 @@ require "rubygems"
 
 
 #Enable local dev-mode.
-if File.exists?("/home/kaspernj/Dev/Ruby/knjrbfw")
-  require "/home/kaspernj/Dev/Ruby/knjrbfw/lib/knjrbfw.rb"
-else
-  require "knjrbfw"
+gems = ["knjrbfw"]
+gems.each do |gem|
+  fpath = "#{File.realpath("#{File.dirname(__FILE__)}/../..")}/#{gem}/lib/#{gem}.rb"
+  
+  if File.exists?(fpath)
+    print "Require gem from custom path: '#{fpath}'.\n"
+    require fpath
+  else
+    print "Require gem: '#{gem}'.\n"
+    require gem
+  end
 end
 
 
